@@ -2,6 +2,11 @@ import RPi.GPIO as GPIO
 import Adafruit_DHT
 from functools import partial
 
+def bool_input(pin):
+    return True if GPIO.input(pin) else False 
+def bool_output(pin, val):
+    return GPIO.output(pin, GPIO.HIGH if val else GPIO.LOW)
+
 class Hardware():
   def __init__(self, hw):
     GPIO.setmode(GPIO.BCM)
@@ -10,13 +15,10 @@ class Hardware():
     self.hw = hw
 
     for k,v in self.hw.items():
-      if v['type'] == 'input':
-        GPIO.setup(v['pin'], GPIO.IN)
-        v['get'] = partial(GPIO.input, v['pin'])
-      elif v['type'] == 'output':
+      if v['type'] == 'bool':
         GPIO.setup(v['pin'], GPIO.OUT)
-        #GPIO.output(v['pin'], GPIO.LOW)
-        v['get'] = lambda: None
+        v['get'] = partial(bool_input, v['pin'])
+        v['set'] = partial(bool_output, v['pin'])
       elif v['type'] == 'temperature.f':
 	  v['get'] = partial(self.read_temperature_f, v['pin'])
       elif v['type'] == 'temperature.c':
@@ -46,3 +48,5 @@ class Hardware():
   def get(self, k):
     return self.hw[k]['get']()
 
+  def set(self, k, v):
+    self.hw[k]['set'](GPIO.HIGH if v else GPIO.LOW)

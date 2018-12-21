@@ -2,6 +2,17 @@ http://randomnerdtutorials.com/raspberry-pi-web-server-using-flask-to-control-gp
 
 ## Usage
 
+### Service Status
+
+    sudo systemctl status garage.service
+
+### Stop Service
+
+    sudo systemctl stop garage.service
+
+### Service Log
+
+    sudo journalctl -u garage.service -b
 
 states/routes
 
