@@ -4,8 +4,8 @@ Description=Garage Sensor Service
 [Service]
 ExecStart=/bin/bash start.sh
 WorkingDirectory=/home/pi/src/garage
-StandardOutput=null
-#Restart=Always
+#StandardOutput=null
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

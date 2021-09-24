@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import Adafruit_DHT
 from functools import partial
+import time
 
 def bool_input(pin):
     return True if GPIO.input(pin) else False 
@@ -25,6 +26,12 @@ class Hardware():
 	  v['get'] = partial(self.read_temperature_c, v['pin'])
       elif v['type'] == 'humidity':
 	  v['get'] = partial(self.read_humidity, v['pin'])
+      elif v['type'] == 'servo':
+          GPIO.setup(v['pin'], GPIO.OUT)
+          pwm = GPIO.PWM(v['pin'], 50) # 50Hz
+          pwm.start(0)
+	  v['set'] = partial(self.set_servo, pwm, v['pin'])
+          v['get'] = partial(GPIO.input, v['pin'])
       else:
         raise(v['type'])
 
@@ -49,4 +56,12 @@ class Hardware():
     return self.hw[k]['get']()
 
   def set(self, k, v):
-    self.hw[k]['set'](GPIO.HIGH if v else GPIO.LOW)
+    self.hw[k]['set'](v)
+
+  def set_servo(self, pwm, pin, v):
+      GPIO.output(pin, True)
+      pwm.ChangeDutyCycle(v)
+      time.sleep(2)
+      GPIO.output(pin, False)
+      pwm.ChangeDutyCycle(0)
+
